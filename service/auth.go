@@ -1,8 +1,12 @@
 package service
 
-import "willow/response"
+import (
+	"willow/response"
+)
 
 type User struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 func (u *User) Login() response.Response {
