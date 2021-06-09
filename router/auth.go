@@ -8,4 +8,5 @@ import (
 
 func authRouter(engine *gin.RouterGroup) {
 	engine.POST("login", api.Login)
+	engine.POST("register", api.Register)
 }

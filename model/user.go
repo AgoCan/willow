@@ -2,7 +2,6 @@ package model
 
 import (
 	"database/sql"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -12,11 +11,11 @@ type User struct {
 	Username  string         `gorm:"type:varchar(128);not null"`
 	Password  string         `gorm:"type:varchar(128);not null"`
 	Nickname  sql.NullString `gorm:"type:varchar(128)"`
-	Role      Role           `gorm:"foreignKey:Role"`
-	RoleID    int
+	Role      Role
+	RoleID    sql.NullInt32
 	IsSupper  uint8
 	IsActive  uint8
-	LastLogin time.Time
+	LastLogin sql.NullTime
 	LastIP    string `gorm:"type:varchar(64)"`
 }
 

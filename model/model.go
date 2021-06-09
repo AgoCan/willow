@@ -33,9 +33,7 @@ func New() (db *gorm.DB) {
 
 }
 
-func MysqlTables(db *gorm.DB) {
-	err := db.AutoMigrate()
-	if err != nil {
-		panic(err)
-	}
+func AutoMigrate(db *gorm.DB) {
+	db.AutoMigrate(&User{})
+	db.AutoMigrate(&Role{})
 }
