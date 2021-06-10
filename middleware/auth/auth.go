@@ -33,7 +33,7 @@ func JWTAuth() gin.HandlerFunc {
 		claims, err := j.ParseToken(token)
 		if err != nil {
 			if err == TokenExpired {
-				c.JSON(http.StatusOK, response.Error(response.ErrAuthExoired))
+				c.JSON(http.StatusOK, response.Error(response.ErrAuthExpired))
 				c.Abort()
 				return
 			}

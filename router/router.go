@@ -23,6 +23,6 @@ func SetupRouter() *gin.Engine {
 
 	v1Auth := router.Group("/api/v1")
 	v1Auth.Use(auth.JWTAuth())
-
+	v1Auth.GET("/healthauth", api.Health)
 	return router
 }

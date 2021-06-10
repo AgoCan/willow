@@ -17,6 +17,7 @@ type User struct {
 	IsActive  uint8
 	LastLogin sql.NullTime
 	LastIP    string `gorm:"type:varchar(64)"`
+	Token     string `gorm:"type:varchar(128)"`
 }
 
 type Role struct {
