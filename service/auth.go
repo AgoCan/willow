@@ -7,8 +7,8 @@ import (
 	"time"
 	"willow/config"
 	"willow/global"
-	"willow/middleware/auth"
 	"willow/model"
+	jwtPkg "willow/pkg/jwt"
 	"willow/response"
 	"willow/utils/hash"
 
@@ -27,6 +27,11 @@ type Register struct {
 	Nickname string `json:"nickName"`
 }
 
+type UserToken struct {
+	ID    int    `json:"id"`
+	Token string `json:"token"`
+}
+
 func (u *UserLogin) Login() response.Response {
 	u.Password = hash.MD5V([]byte(u.Password))
 	var modelU model.User
@@ -36,8 +41,8 @@ func (u *UserLogin) Login() response.Response {
 	if err != nil {
 		return response.Error(response.ErrUsernameOrPassword)
 	}
-	j := &auth.JWT{SigningKey: []byte(config.Conf.Jwt.SigningKey)} // 唯一签名
-	claims := auth.CustomClaims{
+	j := &jwtPkg.JWT{SigningKey: []byte(config.Conf.Jwt.SigningKey)} // 唯一签名
+	claims := jwtPkg.CustomClaims{
 		ID:       modelU.ID,
 		NickName: modelU.Nickname.String,
 		Username: modelU.Username,
@@ -52,6 +57,7 @@ func (u *UserLogin) Login() response.Response {
 		return response.Error(response.ErrJwtToken)
 	}
 	modelU.Token = token
+	global.GDB.Model(&model.User{}).Where("id = ?", modelU.ID).Update("token", token)
 	return response.Success(modelU)
 }
 
@@ -72,4 +78,13 @@ func (r *Register) Create() response.Response {
 		return response.Error(response.ErrSQL)
 	}
 	return response.Success("成功创建用户")
+}
+
+func (t *UserToken) GetUser() (err error, res response.Response) {
+	var u model.User
+	err = global.GDB.Where("id = ?", t.ID).First(&u).Error
+	if err != nil {
+		return err, response.Success("认证错误")
+	}
+	return nil, response.Success("认证成功")
 }
