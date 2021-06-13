@@ -9,7 +9,6 @@ import (
 
 	"willow/config"
 	"willow/global"
-	"willow/model"
 	"willow/response"
 	"willow/router"
 )
@@ -41,8 +40,7 @@ func main() {
 	// 初始化配置文件
 	config.InitConfig(&config.Opt)
 	// 连接数据库并在代码结束后关闭
-	global.GDB = model.New()
-	model.AutoMigrate(global.GDB)
+	global.Init()
 	// 调用路由组
 	router := router.SetupRouter()
 

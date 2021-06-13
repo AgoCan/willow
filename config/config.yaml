@@ -24,3 +24,9 @@ jwt:
   expired: 7200
   store: "file"
   filePath: "data/jwt_auth.db"
+  
+es:
+  index: fluent-bit*
+  key: kubernetes.labels.job-name
+  address: http://elasticsearch-master.logging:9200
+  enable: true

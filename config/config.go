@@ -21,6 +21,7 @@ type Config struct {
 	Db  DbConfig
 	Log LogConfig
 	Jwt Jwt
+	ES  ES
 }
 
 // LogConfig 日志配置文件
