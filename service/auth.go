@@ -3,7 +3,6 @@ package service
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"time"
 	"willow/config"
 	"willow/global"
@@ -72,9 +71,8 @@ func (r *Register) Create() response.Response {
 	}
 
 	u.Password = hash.MD5V([]byte(r.Password))
-	fmt.Println(u.Password)
-	err := global.GDB.Create(&u).Error
-	if err != nil {
+
+	if err := global.GDB.Create(&u).Error; err != nil {
 		return response.Error(response.ErrSQL)
 	}
 	return response.Success("成功创建用户")

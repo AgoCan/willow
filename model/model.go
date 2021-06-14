@@ -36,4 +36,7 @@ func New() (db *gorm.DB) {
 func AutoMigrate(db *gorm.DB) {
 	db.AutoMigrate(&User{})
 	db.AutoMigrate(&Role{})
+
+	db.AutoMigrate(&Machine{})
+	db.AutoMigrate(&MachineGroup{})
 }

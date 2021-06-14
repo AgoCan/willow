@@ -10,9 +10,8 @@ import (
 
 func Logging(c *gin.Context) {
 	value := c.Param("value")
-	if value == "" {
+	if value != "" {
 		c.JSON(200, response.Error(response.ErrCodeParameter))
-		return
 	}
 
 	service := service.Log{
