@@ -25,4 +25,20 @@ type MachineGroup struct {
 	Name string `gorm:"type:varchar(128);not null"`
 }
 
+type MachineOption func(*Machine)
 
+func SetPort(port int) MachineOption {
+	if port == 0 {
+		port = 22
+	}
+	return func(m *Machine) {
+		m.Port = port
+	}
+}
+
+func NewMachine(m ...MachineOption) (machine Machine, err error) {
+	for _, opt := range m {
+		opt(&machine)
+	}
+	return
+}
