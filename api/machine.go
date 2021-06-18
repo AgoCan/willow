@@ -30,7 +30,7 @@ func UpdateMachine(c *gin.Context) {
 		c.JSON(200, response.Error(response.ErrCodeParameter))
 	} else {
 		service.ID = id
-		res := service.Create()
+		res := service.Update()
 		c.JSON(http.StatusOK, res)
 	}
 }

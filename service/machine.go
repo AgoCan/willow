@@ -1,7 +1,6 @@
 package service
 
 import (
-	"database/sql"
 	"errors"
 	"willow/global"
 	"willow/model"
@@ -25,32 +24,20 @@ type Machine struct {
 func (m *Machine) Create() response.Response {
 	var machine model.Machine
 
-	if m.Port == 0 {
-		machine.Port = 22
-	}
-	if m.Type == "password" {
-		if m.Password == "" {
-			return response.Error(response.MachinePasswordIsNull)
-		}
-		machine.Password = sql.NullString{Valid: true, String: m.Password}
-	} else if m.Type == "private" {
-		if m.PrivateKey == "" {
-			return response.Error(response.MachinePrivateKeyIsNull)
-		}
-		machine.PrivateKey = sql.NullString{Valid: true, String: m.PrivateKey}
-	} else {
+	machine, err := model.NewMachine(
+		model.SetPort(m.Port),
+		model.SetUser(m.User),
+		model.SetName(m.Name),
+		model.SetHost(m.Host),
+		model.SetType(m.Type),
+		model.SetPassword(m.Password),
+		model.SetPrivateKey(m.PrivateKey),
+	)
+	if err == model.MachinePasswordIsNull {
+		return response.Error(response.MachinePasswordIsNull)
+	} else if err == model.MachinePrivateKeyIsNull {
 		return response.Error(response.MachinePrivateKeyIsNull)
 	}
-	if m.User == "" {
-		machine.User = "root"
-	} else {
-		machine.User = m.User
-	}
-
-	machine.Name = m.Name
-	machine.Host = m.Host
-	machine.Port = m.Port
-	machine.Type = m.Type
 
 	if !errors.Is(global.GDB.Where("name = ?", machine.Name).First(&machine).Error, gorm.ErrRecordNotFound) {
 		return response.Error(response.MachineNameExist)
@@ -72,10 +59,24 @@ func (m *Machine) Update() response.Response {
 	if errors.Is(global.GDB.Where("id = ?", m.ID).First(&machine).Error, gorm.ErrRecordNotFound) {
 		return response.Error(response.MachineNameExist)
 	}
-	machine.Name = m.Name
-	machine.Host = m.Host
-	machine.Port = m.Port
-	machine.Type = m.Type
+	machine, err := model.NewMachine(
+		model.SetPort(m.Port),
+		model.SetUser(m.User),
+		model.SetName(m.Name),
+		model.SetHost(m.Host),
+		model.SetType(m.Type),
+		model.SetPassword(m.Password),
+		model.SetPrivateKey(m.PrivateKey),
+	)
+	if err == model.MachinePasswordIsNull {
+		return response.Error(response.MachinePasswordIsNull)
+	} else if err == model.MachinePrivateKeyIsNull {
+		return response.Error(response.MachinePrivateKeyIsNull)
+	}
+
+	if err := global.GDB.Model(&model.Machine{}).Where("id = ?", m.ID).Updates(machine).Error; err != nil {
+		return response.Error(response.ErrSQL)
+	}
 
 	return response.Success("成功更新机器")
 }

@@ -8,5 +8,5 @@ import (
 
 func machineRouter(engine *gin.RouterGroup) {
 	engine.POST("machine", api.CreateMachine)
-	engine.POST("machine/:id", api.UpdateMachine)
+	engine.PUT("machine/:id", api.UpdateMachine)
 }

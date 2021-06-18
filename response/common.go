@@ -9,7 +9,7 @@ const (
 	ErrCodeParameter = 41001
 
 	// 5 开头是后端问题
-	ErrSQL = 52001
+	ErrSQL = 50000
 )
 
 func Init() {

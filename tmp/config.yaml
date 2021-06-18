@@ -6,7 +6,7 @@ db:
     password: "123456"
     username: "root"
     port: 3306
-    host: "127.0.0.1"
+    host: "192.168.126.37"
 log:
   # 默认路径是运行程序的目录
   #  logDirector: ./logging
