@@ -57,7 +57,7 @@ func (m *Machine) Update() response.Response {
 
 	var machine model.Machine
 	if errors.Is(global.GDB.Where("id = ?", m.ID).First(&machine).Error, gorm.ErrRecordNotFound) {
-		return response.Error(response.MachineNameExist)
+		return response.Error(response.MachineNameNotExist)
 	}
 	machine, err := model.NewMachine(
 		model.SetPort(m.Port),
@@ -79,4 +79,16 @@ func (m *Machine) Update() response.Response {
 	}
 
 	return response.Success("成功更新机器")
+}
+
+func (m *Machine) Delete() response.Response {
+	var machine model.Machine
+	if errors.Is(global.GDB.Where("id = ?", m.ID).First(&machine).Error, gorm.ErrRecordNotFound) {
+		return response.Error(response.MachineNameNotExist)
+	}
+	if err := global.GDB.Where("id = ?", m.ID).Delete(&machine).Error; err != nil {
+		return response.Error(response.ErrSQL)
+	}
+
+	return response.Success("删除OK")
 }

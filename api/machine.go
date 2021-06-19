@@ -34,3 +34,16 @@ func UpdateMachine(c *gin.Context) {
 		c.JSON(http.StatusOK, res)
 	}
 }
+
+func DeleteMachine(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(200, response.Error(response.ErrCodeParameter))
+		return
+	}
+	service := service.Machine{}
+	service.ID = id
+	res := service.Delete()
+	c.JSON(http.StatusOK, res)
+
+}

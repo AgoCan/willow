@@ -9,4 +9,5 @@ import (
 func machineRouter(engine *gin.RouterGroup) {
 	engine.POST("machine", api.CreateMachine)
 	engine.PUT("machine/:id", api.UpdateMachine)
+	engine.DELETE("machine/:id", api.DeleteMachine)
 }
