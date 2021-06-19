@@ -47,3 +47,22 @@ func DeleteMachine(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 
 }
+
+func QueryMachine(c *gin.Context) {
+	service := service.Machine{}
+
+	res := service.Query()
+	c.JSON(http.StatusOK, res)
+}
+
+func GetMachine(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(200, response.Error(response.ErrCodeParameter))
+		return
+	}
+	service := service.Machine{}
+
+	res := service.Get(id)
+	c.JSON(http.StatusOK, res)
+}

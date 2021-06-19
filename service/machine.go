@@ -6,6 +6,7 @@ import (
 	"willow/model"
 	"willow/response"
 
+	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
 )
 
@@ -91,4 +92,26 @@ func (m *Machine) Delete() response.Response {
 	}
 
 	return response.Success("删除OK")
+}
+
+func (m *Machine) Query() response.Response {
+	var machines []model.Machine
+	global.GDB.Find(&machines)
+
+	ms := make([]Machine, len(machines))
+
+	for i, item := range machines {
+		copier.Copy(m, item)
+		ms[i] = *m
+	}
+	return response.Success(ms)
+}
+
+func (m *Machine) Get(id int) response.Response {
+	var machine model.Machine
+	if errors.Is(global.GDB.Where("id = ?", id).First(&machine).Error, gorm.ErrRecordNotFound) {
+		return response.Error(response.MachineNameNotExist)
+	}
+	copier.Copy(m, machine)
+	return response.Success(m)
 }
