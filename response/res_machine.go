@@ -6,7 +6,9 @@ const (
 	MachineNameExist        = 53002
 	MachineHostExist        = 53003
 	MachineTypeError        = 53004
-	MachineNameNotExist     = 5305
+	MachineNameNotExist     = 53005
+	MachineGroupNotExist    = 53006
+	MachineGroupExist       = 53007
 )
 
 func machineRes(msg map[int]string) map[int]string {
@@ -16,5 +18,7 @@ func machineRes(msg map[int]string) map[int]string {
 	msg[MachineHostExist] = "主机已经存在"
 	msg[MachineTypeError] = "类型错误"
 	msg[MachineNameNotExist] = "节点不存在"
+	msg[MachineGroupNotExist] = "机器组不存在"
+	msg[MachineGroupExist] = "机器组已存在"
 	return msg
 }

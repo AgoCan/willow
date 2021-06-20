@@ -28,7 +28,7 @@ type Machine struct {
 
 type MachineGroup struct {
 	gorm.Model
-	Name string `gorm:"type:varchar(128);not null"`
+	Name string `gorm:"type:varchar(128);not null;unique"`
 }
 
 type MachineOption func(*Machine)
@@ -77,6 +77,21 @@ func SetName(n string) MachineOption {
 func SetHost(h string) MachineOption {
 	return func(m *Machine) {
 		m.Host = h
+	}
+}
+
+func SetGroup(id uint) MachineOption {
+	if id == 0 {
+		return func(m *Machine) {
+			m.MachineGroup = MachineGroup{}
+		}
+	}
+	return func(m *Machine) {
+		m.MachineGroup = MachineGroup{
+			Model: gorm.Model{
+				ID: id,
+			},
+		}
 	}
 }
 

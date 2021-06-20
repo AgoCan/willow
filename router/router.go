@@ -14,14 +14,15 @@ func SetupRouter() *gin.Engine {
 	if err := log.InitLogger(); err != nil {
 		panic(err)
 	}
-	router.Use(log.GinLogger(log.Logger),
-		log.GinRecovery(log.Logger, true))
+	// router.Use(log.GinLogger(log.Logger),
+	// 	log.GinRecovery(log.Logger, true))
 	router.GET("/health", api.Health)
 
 	v1NoAuth := router.Group("/api/v1")
 	authRouter(v1NoAuth)
 	loggingRouter(v1NoAuth)
 	machineRouter(v1NoAuth)
+	machineGroupRouter(v1NoAuth)
 
 	v1Auth := router.Group("/api/v1")
 	v1Auth.Use(auth.JWTAuth())

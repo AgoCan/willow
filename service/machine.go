@@ -11,19 +11,30 @@ import (
 )
 
 type Machine struct {
-	ID         int    `json:"id"`
-	Name       string `json:"name" binding:"required"`
-	Host       string `json:"host" binding:"required"`
-	Port       int    `json:"port"`
-	PrivateKey string `json:"privateKey"`
-	PublicKey  string `json:"publicKey"`
-	Type       string `json:"type"`
-	User       string `json:"user"`
-	Password   string `json:"password"`
+	ID           int          `json:"id"`
+	Name         string       `json:"name" binding:"required"`
+	Host         string       `json:"host" binding:"required"`
+	Port         int          `json:"port"`
+	PrivateKey   string       `json:"privateKey"`
+	PublicKey    string       `json:"publicKey"`
+	Type         string       `json:"type"`
+	User         string       `json:"user"`
+	Password     string       `json:"password"`
+	MachineGroup MachineGroup `json:"machine_group"`
+}
+
+type MachineGroup struct {
+	ID   int    `json:"id"`
+	Name string `json:"name" binding:"required"`
 }
 
 func (m *Machine) Create() response.Response {
 	var machine model.Machine
+	var group model.MachineGroup
+
+	if errors.Is(global.GDB.Where("name = ?", machine.MachineGroup.Name).First(&group).Error, gorm.ErrRecordNotFound) {
+		return response.Error(response.MachineGroupNotExist)
+	}
 
 	machine, err := model.NewMachine(
 		model.SetPort(m.Port),
@@ -33,6 +44,7 @@ func (m *Machine) Create() response.Response {
 		model.SetType(m.Type),
 		model.SetPassword(m.Password),
 		model.SetPrivateKey(m.PrivateKey),
+		model.SetGroup(group.ID),
 	)
 	if err == model.MachinePasswordIsNull {
 		return response.Error(response.MachinePasswordIsNull)
@@ -109,9 +121,72 @@ func (m *Machine) Query() response.Response {
 
 func (m *Machine) Get(id int) response.Response {
 	var machine model.Machine
-	if errors.Is(global.GDB.Where("id = ?", id).First(&machine).Error, gorm.ErrRecordNotFound) {
+	if errors.Is(global.GDB.Where("machines.id = ?", id).Joins("MachineGroup").First(&machine).Error, gorm.ErrRecordNotFound) {
 		return response.Error(response.MachineNameNotExist)
 	}
 	copier.Copy(m, machine)
 	return response.Success(m)
+}
+
+func (g *MachineGroup) Create() response.Response {
+	var group model.MachineGroup
+	if !errors.Is(global.GDB.Where("name = ?", g.Name).First(&group).Error, gorm.ErrRecordNotFound) {
+		return response.Error(response.MachineGroupExist)
+	}
+	group.Name = g.Name
+	if err := global.GDB.Create(&group).Error; err != nil {
+		return response.Error(response.ErrSQL)
+	}
+	return response.Success("创建OK")
+}
+
+func (g *MachineGroup) Delete() response.Response {
+	var group model.MachineGroup
+	if errors.Is(global.GDB.Where("id = ?", g.ID).First(&group).Error, gorm.ErrRecordNotFound) {
+		return response.Error(response.MachineGroupNotExist)
+	}
+	if err := global.GDB.Where("id = ?", g.ID).Delete(&group).Error; err != nil {
+		return response.Error(response.ErrSQL)
+	}
+	return response.Success("删除OK")
+}
+
+func (g *MachineGroup) Query() response.Response {
+	var group []model.MachineGroup
+	global.GDB.Find(&group)
+
+	gs := make([]MachineGroup, len(group))
+
+	for i, item := range group {
+		copier.Copy(g, item)
+		gs[i] = *g
+	}
+	return response.Success(gs)
+}
+
+func (g *MachineGroup) Update() response.Response {
+	var group model.MachineGroup
+	if errors.Is(global.GDB.Where("id = ?", g.ID).First(&group).Error, gorm.ErrRecordNotFound) {
+		return response.Error(response.MachineGroupNotExist)
+	}
+	if err := global.GDB.Model(&model.MachineGroup{}).Where("id = ?", g.ID).Updates(group).Error; err != nil {
+		return response.Error(response.ErrSQL)
+	}
+	group.Name = g.Name
+
+	return response.Success("更新OK")
+}
+func (g *MachineGroup) Get(id int) response.Response {
+	// get 请求应该吧machine也给查询出来进行输送
+	var machines []model.Machine
+	m := new(Machine)
+	global.GDB.Where("machine_group_id = ?", id).Find(&machines)
+
+	ms := make([]Machine, len(machines))
+
+	for i, item := range machines {
+		copier.Copy(m, item)
+		ms[i] = *m
+	}
+	return response.Success(ms)
 }
