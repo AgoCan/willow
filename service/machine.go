@@ -25,14 +25,14 @@ type Machine struct {
 
 type MachineGroup struct {
 	ID   int    `json:"id"`
-	Name string `json:"name" binding:"required"`
+	Name string `json:"name"`
 }
 
 func (m *Machine) Create() response.Response {
 	var machine model.Machine
 	var group model.MachineGroup
 
-	if errors.Is(global.GDB.Where("name = ?", machine.MachineGroup.Name).First(&group).Error, gorm.ErrRecordNotFound) {
+	if errors.Is(global.GDB.Where("name = ?", m.MachineGroup.Name).First(&group).Error, gorm.ErrRecordNotFound) {
 		return response.Error(response.MachineGroupNotExist)
 	}
 
