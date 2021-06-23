@@ -21,3 +21,7 @@ func machineGroupRouter(engine *gin.RouterGroup) {
 	engine.PUT("machinegroup/:id", api.UpdateMachineGroup)
 	engine.DELETE("machinegroup/:id", api.DeleteMachineGroup)
 }
+
+func machineOperationRouter(engine *gin.RouterGroup) {
+	engine.POST("execution", api.MachineExcute)
+}

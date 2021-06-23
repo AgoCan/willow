@@ -28,6 +28,12 @@ type MachineGroup struct {
 	Name string `json:"name"`
 }
 
+type MachineExcute struct {
+	MachineIDS      []int  `json:"machine_ids"`
+	MachineGroupIDS []int  `json:"machine_group_ids"`
+	Command         string `json:"command" binding:"required"`
+}
+
 func (m *Machine) Create() response.Response {
 	var machine model.Machine
 	var group model.MachineGroup
@@ -189,4 +195,36 @@ func (g *MachineGroup) Get(id int) response.Response {
 		ms[i] = *m
 	}
 	return response.Success(ms)
+}
+
+func (e *MachineExcute) Excute() response.Response {
+	if len(e.MachineGroupIDS) == 0 && len(e.MachineIDS) == 0 {
+		return response.Error(response.MachineGroupIDIsNull)
+	}
+	var machinesByGroup []model.Machine
+	if len(e.MachineGroupIDS) != 0 {
+		global.GDB.Where("machine_group_id IN ?", e.MachineGroupIDS).Find(&machinesByGroup)
+	}
+	var machines []model.Machine
+	if len(e.MachineIDS) != 0 {
+		global.GDB.Find(&machines, e.MachineIDS)
+	}
+
+	machines = append(machines, machinesByGroup...)
+
+	// 去重,此处不用int用空结构体更加省空间
+	machinesMap := make(map[model.Machine]int, len(machines))
+	for _, item := range machines {
+		if _, ok := machinesMap[item]; !ok {
+			machinesMap[item] = 1
+		} else {
+			machinesMap[item]++
+		}
+	}
+
+	m := []model.Machine{}
+	for i := range machinesMap {
+		m = append(m, i)
+	}
+	return response.Success("执行ok")
 }

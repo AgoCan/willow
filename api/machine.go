@@ -124,3 +124,13 @@ func GetMachineGroup(c *gin.Context) {
 	res := service.Get(id)
 	c.JSON(http.StatusOK, res)
 }
+
+func MachineExcute(c *gin.Context) {
+	service := service.MachineExcute{}
+	if err := c.ShouldBind(&service); err != nil {
+		c.JSON(200, response.Error(response.ErrCodeParameter))
+	} else {
+		res := service.Excute()
+		c.JSON(http.StatusOK, res)
+	}
+}

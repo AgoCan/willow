@@ -23,6 +23,7 @@ func SetupRouter() *gin.Engine {
 	loggingRouter(v1NoAuth)
 	machineRouter(v1NoAuth)
 	machineGroupRouter(v1NoAuth)
+	machineOperationRouter(v1NoAuth)
 
 	v1Auth := router.Group("/api/v1")
 	v1Auth.Use(auth.JWTAuth())
