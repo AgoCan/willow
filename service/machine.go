@@ -2,8 +2,10 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"willow/global"
 	"willow/model"
+	"willow/pkg/ssh"
 	"willow/response"
 
 	"github.com/jinzhu/copier"
@@ -222,9 +224,18 @@ func (e *MachineExcute) Excute() response.Response {
 		}
 	}
 
-	m := []model.Machine{}
-	for i := range machinesMap {
-		m = append(m, i)
+	for mac := range machinesMap {
+
+		go func(mac model.Machine, command string, host string) {
+			s := ssh.NewSsh(mac.User, mac.Host, mac.Type, mac.Password.String, mac.Port)
+			res, err := s.Excute(command)
+			if err != nil {
+
+			}
+			fmt.Println(host, res)
+			// 这里把res写进redis，然后从redis读取，并且设置缓存时间
+		}(mac, e.Command, mac.Host)
 	}
-	return response.Success(m)
+
+	return response.Success("后台执行中...")
 }
