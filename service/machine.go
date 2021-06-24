@@ -226,5 +226,5 @@ func (e *MachineExcute) Excute() response.Response {
 	for i := range machinesMap {
 		m = append(m, i)
 	}
-	return response.Success("执行ok")
+	return response.Success(m)
 }
